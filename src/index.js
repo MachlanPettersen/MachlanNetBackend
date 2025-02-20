@@ -7,15 +7,20 @@ const songRoutes = require("./routes/songRoutes");
 
 const app = express();
 
-app.use(
-  cors({
-    origin: ["https://machlan.net", "http://localhost:3000"],
-    methods: ["GET", "POST", "DELETE"],
-    credentials: true,
-  })
-);
+const corsOptions = {
+  origin: ["https://machlan.net", "http://localhost:3000"],
+  methods: ["GET", "POST", "DELETE", "OPTIONS"], // Added OPTIONS
+  allowedHeaders: ["Content-Type", "Authorization"], // Explicitly specify allowed headers
+  credentials: true,
+  optionsSuccessStatus: 200, // Some legacy browsers choke on 204
+};
+
+app.use(cors(corsOptions));
 app.use(express.json({ limit: "50mb" })); // Increased limit for base64 images
 app.use(express.urlencoded({ extended: true }));
+
+// Handle preflight requests explicitly
+app.options("*", cors(corsOptions)); // Enable pre-flight for all routes
 
 // Connect to MongoDB
 mongoose
